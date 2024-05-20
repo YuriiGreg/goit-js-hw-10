@@ -1,25 +1,22 @@
-import iziToast from "izitoast";
-import "izitoast/dist/css/iziToast.min.css";
+import iziToast from 'https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js';
 
-const form = document.querySelector('.form');
-
-form.addEventListener('submit', (event) => {
+document.querySelector('.form').addEventListener('submit', (event) => {
   event.preventDefault();
 
-  const delay = parseInt(event.target.delay.value, 10);
+  const delay = Number(event.target.delay.value);
   const state = event.target.state.value;
 
   createPromise(delay, state)
-    .then((delay) => {
+    .then((message) => {
       iziToast.success({
         title: 'Success',
-        message: `✅ Fulfilled promise in ${delay}ms`,
+        message: message,
       });
     })
-    .catch((delay) => {
+    .catch((message) => {
       iziToast.error({
         title: 'Error',
-        message: `❌ Rejected promise in ${delay}ms`,
+        message: message,
       });
     });
 });
@@ -28,9 +25,9 @@ function createPromise(delay, state) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (state === 'fulfilled') {
-        resolve(delay);
+        resolve(`✅ Fulfilled promise in ${delay}ms`);
       } else {
-        reject(delay);
+        reject(`❌ Rejected promise in ${delay}ms`);
       }
     }, delay);
   });
