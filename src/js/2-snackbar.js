@@ -1,6 +1,7 @@
-import iziToast from 'https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js';
+import iziToast from "izitoast";
+import "izitoast/dist/css/iziToast.min.css";
 
-document.querySelector('.form').addEventListener('submit', (event) => {
+document.querySelector(".form").addEventListener("submit", (event) => {
   event.preventDefault();
 
   const delay = Number(event.target.delay.value);
@@ -9,13 +10,13 @@ document.querySelector('.form').addEventListener('submit', (event) => {
   createPromise(delay, state)
     .then((message) => {
       iziToast.success({
-        title: 'Success',
+        title: "Success",
         message: message,
       });
     })
     .catch((message) => {
       iziToast.error({
-        title: 'Error',
+        title: "Error",
         message: message,
       });
     });
@@ -24,7 +25,7 @@ document.querySelector('.form').addEventListener('submit', (event) => {
 function createPromise(delay, state) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (state === 'fulfilled') {
+      if (state === "fulfilled") {
         resolve(`✅ Fulfilled promise in ${delay}ms`);
       } else {
         reject(`❌ Rejected promise in ${delay}ms`);

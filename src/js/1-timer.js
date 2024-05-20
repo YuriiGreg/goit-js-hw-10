@@ -3,15 +3,15 @@ import "flatpickr/dist/flatpickr.min.css";
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 
-const datetimePicker = document.getElementById("#datetime-picker");
-const startButton = document.querySelector('.button[data-start]');
-const daysValue = document.querySelector('[data-days]');
-const hoursValue = document.querySelector('[data-hours]');
-const minutesValue = document.querySelector('[data-minutes]');
-const secondsValue = document.querySelector('[data-seconds]');
+const datetimePicker = document.querySelector("#datetime-picker");
+const startButton = document.querySelector("button[data-start]");
+const daysSpan = document.querySelector("span[data-days]");
+const hoursSpan = document.querySelector("span[data-hours]");
+const minutesSpan = document.querySelector("span[data-minutes]");
+const secondsSpan = document.querySelector("span[data-seconds]");
 
-let userSelectedDate;
-let timerInterval;
+let userSelectedDate = null;
+let countdownInterval = null;
 
 const options = {
   enableTime: true,
@@ -35,31 +35,38 @@ const options = {
 
 flatpickr(datetimePicker, options);
 
-startButton.addEventListener('click', () => {
+startButton.addEventListener("click", () => {
+  if (!userSelectedDate) return;
+
   startButton.disabled = true;
   datetimePicker.disabled = true;
 
-  timerInterval = setInterval(() => {
-    const now = new Date();
-    const timeRemaining = userSelectedDate - now;
-
-    if (timeRemaining <= 0) {
-      clearInterval(timerInterval);
-      updateTimerUI(0, 0, 0, 0);
+  countdownInterval = setInterval(() => {
+    const currentTime = new Date();
+    const timeDifference = userSelectedDate - currentTime;
+    
+    if (timeDifference <= 0) {
+      clearInterval(countdownInterval);
       datetimePicker.disabled = false;
+      startButton.disabled = true;
+      updateTimerDisplay(0, 0, 0, 0);
+      iziToast.success({
+        title: 'Success',
+        message: 'The countdown has ended!',
+      });
       return;
     }
 
-    const { days, hours, minutes, seconds } = convertMs(timeRemaining);
-    updateTimerUI(days, hours, minutes, seconds);
+    const { days, hours, minutes, seconds } = convertMs(timeDifference);
+    updateTimerDisplay(days, hours, minutes, seconds);
   }, 1000);
 });
 
-function updateTimerUI(days, hours, minutes, seconds) {
-  daysValue.textContent = addLeadingZero(days);
-  hoursValue.textContent = addLeadingZero(hours);
-  minutesValue.textContent = addLeadingZero(minutes);
-  secondsValue.textContent = addLeadingZero(seconds);
+function updateTimerDisplay(days, hours, minutes, seconds) {
+  daysSpan.textContent = addLeadingZero(days);
+  hoursSpan.textContent = addLeadingZero(hours);
+  minutesSpan.textContent = addLeadingZero(minutes);
+  secondsSpan.textContent = addLeadingZero(seconds);
 }
 
 function addLeadingZero(value) {
@@ -74,11 +81,12 @@ function convertMs(ms) {
 
   const days = Math.floor(ms / day);
   const hours = Math.floor((ms % day) / hour);
-  const minutes = Math.floor(((ms % day) % hour) / minute);
-  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
+  const minutes = Math.floor((ms % hour) / minute);
+  const seconds = Math.floor((ms % minute) / second);
 
   return { days, hours, minutes, seconds };
 }
+
 
 console.log(convertMs(2000)); // {days: 0, hours: 0, minutes: 0, seconds: 2}
 console.log(convertMs(140000)); // {days: 0, hours: 0, minutes: 2, seconds: 20}
